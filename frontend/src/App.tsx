@@ -28,6 +28,12 @@ type CategoryShortcut = {
   slug: string;
   label: string;
 };
+type DifficultyOption = {
+  id: "easy" | "medium" | "hard";
+  label: string;
+  stars: number;
+  stageIndex: number;
+};
 
 const DEFAULT_CATEGORY = "all-indian-songs";
 const DEFAULT_REVEAL_STAGES = [0.1, 0.5, 2, 5, 8];
@@ -36,14 +42,18 @@ const GENRE_SHORTCUTS: CategoryShortcut[] = [
   { slug: "bollywood", label: "Bollywood" },
   { slug: "classical", label: "Classical" },
   { slug: "indie", label: "Indie" },
-  { slug: "punjabi", label: "Punjabi" }
+  { slug: "90s", label: "Retro" }
 ];
 const YEAR_SHORTCUTS: CategoryShortcut[] = [
   { slug: "2020s", label: "2020s" },
   { slug: "2010s", label: "2010s" },
   { slug: "2000s", label: "2000s" },
-  { slug: "90s", label: "90s" },
   { slug: "all-indian-songs", label: "All" }
+];
+const DIFFICULTY_OPTIONS: DifficultyOption[] = [
+  { id: "easy", label: "Easy", stars: 1, stageIndex: 3 },
+  { id: "medium", label: "Medium", stars: 2, stageIndex: 1 },
+  { id: "hard", label: "Hard", stars: 3, stageIndex: 0 }
 ];
 
 function formatDuration(seconds: number) {
@@ -60,6 +70,7 @@ function App() {
   const [suggestions, setSuggestions] = useState<SongSearchResult[]>([]);
   const [answer, setAnswer] = useState<SongAnswer | null>(null);
   const [score, setScore] = useState(0);
+  const [difficulty, setDifficulty] = useState<DifficultyOption["id"]>("hard");
   const [message, setMessage] = useState("Choose a category and start a song.");
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -72,6 +83,8 @@ function App() {
     () => categories.find((category) => category.slug === selectedCategory),
     [categories, selectedCategory]
   );
+  const currentDifficulty =
+    DIFFICULTY_OPTIONS.find((option) => option.id === difficulty) ?? DIFFICULTY_OPTIONS[2];
 
   const revealStages = round?.reveal_stages_seconds ?? DEFAULT_REVEAL_STAGES;
   const currentDuration = revealStages[stageIndex] ?? revealStages[0];
@@ -136,7 +149,7 @@ function App() {
     setGuess("");
     setSuggestions([]);
     setAnswer(null);
-    setStageIndex(0);
+    setStageIndex(currentDifficulty.stageIndex);
     setMessage("Category selected. Start a song.");
   }
 
@@ -147,7 +160,7 @@ function App() {
     setGuess("");
     setSuggestions([]);
     setAnswer(null);
-    setStageIndex(0);
+    setStageIndex(currentDifficulty.stageIndex);
 
     try {
       const nextRound = await fetchRound(selectedCategory);
@@ -172,6 +185,15 @@ function App() {
     stopAudio();
     setStageIndex(index);
     setMessage(`${formatDuration(revealStages[index])} clip selected.`);
+  }
+
+  function selectDifficulty(option: DifficultyOption) {
+    stopAudio();
+    setDifficulty(option.id);
+
+    if (round && !isRoundFinished) {
+      setStageIndex(option.stageIndex);
+    }
   }
 
   function playGeneratedTone(duration: number, frequency: number) {
@@ -315,8 +337,9 @@ function App() {
         <div className="score-pill" aria-label={`Current score ${score}`}>
           <span>Score</span>
           <strong>{score}</strong>
-          <Star aria-hidden="true" fill="currentColor" />
-          <Star aria-hidden="true" fill="currentColor" />
+          {Array.from({ length: currentDifficulty.stars }).map((_, index) => (
+            <Star aria-hidden="true" fill="currentColor" key={index} />
+          ))}
         </div>
       </header>
 
@@ -331,6 +354,25 @@ function App() {
           <h2>Year</h2>
           <div className="accent-line" aria-hidden="true" />
           <div className="filter-stack">{YEAR_SHORTCUTS.map(renderCategoryButton)}</div>
+
+          <h2 className="difficulty-heading">Difficulty</h2>
+          <div className="accent-line" aria-hidden="true" />
+          <div className="difficulty-row" aria-label="Difficulty">
+            {DIFFICULTY_OPTIONS.map((option) => (
+              <button
+                className="difficulty-button"
+                type="button"
+                key={option.id}
+                aria-pressed={difficulty === option.id}
+                aria-label={`Choose ${option.label} difficulty`}
+                onClick={() => selectDifficulty(option)}
+              >
+                {Array.from({ length: option.stars }).map((_, index) => (
+                  <Star aria-hidden="true" fill="currentColor" key={index} />
+                ))}
+              </button>
+            ))}
+          </div>
         </aside>
 
         <section className="game-card" aria-labelledby="game-heading">
@@ -358,10 +400,7 @@ function App() {
               <span>clip length</span>
               <small>{currentPoints} points if correct</small>
             </div>
-
-            <div className="status-message" role="status" aria-live="polite">
-              {message}
-            </div>
+            <div className="sr-only" role="status" aria-live="polite">{message}</div>
           </div>
 
           <fieldset className="duration-picker" disabled={!round || isRoundFinished}>
