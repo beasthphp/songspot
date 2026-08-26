@@ -7,7 +7,8 @@ import {
   Music2,
   Play,
   RotateCcw,
-  Search
+  Search,
+  Star
 } from "lucide-react";
 import {
   fetchAnswer,
@@ -23,10 +24,27 @@ type BrowserAudioWindow = Window &
   typeof globalThis & {
     webkitAudioContext?: typeof AudioContext;
   };
+type CategoryShortcut = {
+  slug: string;
+  label: string;
+};
 
 const DEFAULT_CATEGORY = "all-indian-songs";
 const DEFAULT_REVEAL_STAGES = [0.1, 0.5, 2, 5, 8];
 const STAGE_POINTS = [100, 80, 60, 40, 20];
+const GENRE_SHORTCUTS: CategoryShortcut[] = [
+  { slug: "bollywood", label: "Bollywood" },
+  { slug: "classical", label: "Classical" },
+  { slug: "indie", label: "Indie" },
+  { slug: "punjabi", label: "Punjabi" }
+];
+const YEAR_SHORTCUTS: CategoryShortcut[] = [
+  { slug: "2020s", label: "2020s" },
+  { slug: "2010s", label: "2010s" },
+  { slug: "2000s", label: "2000s" },
+  { slug: "90s", label: "90s" },
+  { slug: "all-indian-songs", label: "All" }
+];
 
 function formatDuration(seconds: number) {
   return `${seconds.toFixed(seconds < 1 ? 1 : 0)}s`;
@@ -42,7 +60,7 @@ function App() {
   const [suggestions, setSuggestions] = useState<SongSearchResult[]>([]);
   const [answer, setAnswer] = useState<SongAnswer | null>(null);
   const [score, setScore] = useState(0);
-  const [message, setMessage] = useState("Choose a category, start a song, then pick any clip length.");
+  const [message, setMessage] = useState("Choose a category and start a song.");
   const [isPlaying, setIsPlaying] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -110,6 +128,18 @@ function App() {
     setIsPlaying(false);
   }
 
+  function chooseCategory(slug: string) {
+    stopAudio();
+    setSelectedCategory(slug);
+    setRound(null);
+    setRoundState("idle");
+    setGuess("");
+    setSuggestions([]);
+    setAnswer(null);
+    setStageIndex(0);
+    setMessage("Category selected. Start a song.");
+  }
+
   async function startRound() {
     stopAudio();
     setRoundState("loading");
@@ -125,7 +155,7 @@ function App() {
       setRoundState("ready");
       setMessage(
         nextRound.has_audio_preview
-          ? "Pick any clip length and press play."
+          ? "Pick a clip length and press play."
           : "Licensed preview pending. Development tone is ready."
       );
     } catch {
@@ -250,162 +280,188 @@ function App() {
     setSuggestions([]);
   }
 
+  function renderCategoryButton(shortcut: CategoryShortcut) {
+    const category = categories.find((item) => item.slug === shortcut.slug);
+
+    if (!category) {
+      return null;
+    }
+
+    return (
+      <button
+        className="filter-button"
+        type="button"
+        key={shortcut.slug}
+        aria-pressed={selectedCategory === shortcut.slug}
+        aria-label={`Choose ${category.name} category`}
+        onClick={() => chooseCategory(shortcut.slug)}
+      >
+        {shortcut.label}
+      </button>
+    );
+  }
+
   return (
     <main className="app-shell">
-      <section className="masthead" aria-labelledby="app-title">
-        <div>
-          <p className="eyebrow">Indian music guessing game</p>
+      <div className="film-strip film-strip-left" aria-hidden="true" />
+      <div className="film-strip film-strip-right" aria-hidden="true" />
+
+      <header className="topbar" aria-labelledby="app-title">
+        <div className="brand-lockup">
+          <p className="eyebrow">Indian Music Guessing Game</p>
           <h1 id="app-title">SongSpot.in</h1>
         </div>
-        <div className="score" aria-label={`Current score ${score}`}>
+
+        <div className="score-pill" aria-label={`Current score ${score}`}>
           <span>Score</span>
           <strong>{score}</strong>
+          <Star aria-hidden="true" fill="currentColor" />
+          <Star aria-hidden="true" fill="currentColor" />
         </div>
-      </section>
+      </header>
 
-      <section className="category-section" aria-labelledby="category-heading">
-        <div className="section-heading">
-          <h2 id="category-heading">Category</h2>
-          <span>{currentCategory?.name ?? "Select one"}</span>
-        </div>
-        <div className="category-grid">
-          {categories.map((category) => (
-            <button
-              className="category-button"
-              type="button"
-              key={category.slug}
-              aria-pressed={selectedCategory === category.slug}
-              onClick={() => setSelectedCategory(category.slug)}
-            >
-              <span>{category.name}</span>
-              {selectedCategory === category.slug && <small>Selected</small>}
-            </button>
-          ))}
-        </div>
-      </section>
+      <div className="game-layout">
+        <aside className="filters-card" aria-labelledby="filters-heading">
+          <h2 id="filters-heading">Genre</h2>
+          <div className="accent-line" aria-hidden="true" />
+          <div className="filter-stack">{GENRE_SHORTCUTS.map(renderCategoryButton)}</div>
 
-      <section className="game-surface" aria-labelledby="game-heading">
-        <div className="game-header">
-          <div>
-            <p className="eyebrow">{currentCategory?.name ?? "Category"}</p>
+          <div className="filter-divider" aria-hidden="true" />
+
+          <h2>Year</h2>
+          <div className="accent-line" aria-hidden="true" />
+          <div className="filter-stack">{YEAR_SHORTCUTS.map(renderCategoryButton)}</div>
+        </aside>
+
+        <section className="game-card" aria-labelledby="game-heading">
+          <div className="game-category-bar">
+            <Music2 aria-hidden="true" />
+            <span>{currentCategory?.name ?? "Category"}</span>
+          </div>
+
+          <div className="game-center">
             <h2 id="game-heading">Guess The Song</h2>
-          </div>
-          <button className="secondary-button" type="button" onClick={startRound}>
-            {roundState === "loading" ? (
-              <Loader2 aria-hidden="true" className="spin" />
-            ) : (
-              <RotateCcw aria-hidden="true" />
-            )}
-            {round ? "New Song" : "Start"}
-          </button>
-        </div>
+            <div className="title-line" aria-hidden="true" />
 
-        <div className="player-row">
-          <button
-            className="play-button"
-            type="button"
-            aria-label={`Play ${formatDuration(currentDuration)} preview`}
-            disabled={!round || roundState === "loading" || isRoundFinished}
-            onClick={playPreview}
-          >
-            {isPlaying ? <Headphones aria-hidden="true" /> : <Play aria-hidden="true" />}
-          </button>
-          <div className="duration-readout">
-            <span>Clip length</span>
-            <strong>{formatDuration(currentDuration)}</strong>
-            <small>{currentPoints} points if correct</small>
-          </div>
-          <div className="status-message" role="status" aria-live="polite">
-            {message}
-          </div>
-        </div>
-
-        <fieldset className="duration-picker" disabled={!round || isRoundFinished}>
-          <legend>Choose Preview Length</legend>
-          <div className="duration-options">
-            {revealStages.map((seconds, index) => (
-              <button
-                className="duration-option"
-                type="button"
-                key={seconds}
-                aria-pressed={index === stageIndex}
-                onClick={() => selectDuration(index)}
-              >
-                <span>{formatDuration(seconds)}</span>
-                <small>{STAGE_POINTS[index]} pts</small>
-              </button>
-            ))}
-          </div>
-        </fieldset>
-
-        <form className="guess-form" onSubmit={handleGuess}>
-          <label htmlFor="song-search">
-            <Search aria-hidden="true" />
-            Song search
-          </label>
-          <div className="search-wrap">
-            <input
-              id="song-search"
-              type="search"
-              value={guess}
-              autoComplete="off"
-              placeholder="Type a song title"
-              disabled={!canGuess}
-              aria-describedby="guess-help"
-              onChange={(event) => setGuess(event.target.value)}
-            />
-            {suggestions.length > 0 && (
-              <ul className="suggestions" role="listbox" aria-label="Song suggestions">
-                {suggestions.map((song) => (
-                  <li key={song.id}>
-                    <button type="button" onClick={() => pickSuggestion(song)}>
-                      <Music2 aria-hidden="true" />
-                      <span>
-                        {song.title}
-                        <small>
-                          {song.artist} - {song.year}
-                        </small>
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <p id="guess-help" className="sr-only">
-            Type a song name, choose a suggestion, then submit your guess.
-          </p>
-          <div className="action-row">
-            <button className="primary-button" type="submit" disabled={!canGuess || !guess.trim()}>
-              <Check aria-hidden="true" />
-              Guess
-            </button>
             <button
-              className="secondary-button"
+              className="play-button"
               type="button"
+              aria-label={`Play ${formatDuration(currentDuration)} preview`}
               disabled={!round || roundState === "loading" || isRoundFinished}
-              onClick={showAnswer}
+              onClick={playPreview}
             >
-              <Eye aria-hidden="true" />
-              Show Answer
+              {isPlaying ? <Headphones aria-hidden="true" /> : <Play aria-hidden="true" />}
             </button>
-          </div>
-        </form>
 
-        {answer && (
-          <div className="answer-panel">
-            <span>{roundState === "correct" ? "You got it" : "Answer"}</span>
-            <strong>{answer.title}</strong>
-            <small>
-              {answer.artist} - {answer.year}
-            </small>
-            <button className="primary-button" type="button" onClick={startRound}>
-              <RotateCcw aria-hidden="true" />
-              Next Song
+            <div className="duration-readout">
+              <strong>{formatDuration(currentDuration)}</strong>
+              <span>clip length</span>
+              <small>{currentPoints} points if correct</small>
+            </div>
+
+            <div className="status-message" role="status" aria-live="polite">
+              {message}
+            </div>
+          </div>
+
+          <fieldset className="duration-picker" disabled={!round || isRoundFinished}>
+            <legend>Clip Length</legend>
+            <div className="duration-options">
+              {revealStages.map((seconds, index) => (
+                <button
+                  className="duration-option"
+                  type="button"
+                  key={seconds}
+                  aria-pressed={index === stageIndex}
+                  onClick={() => selectDuration(index)}
+                >
+                  <span>{formatDuration(seconds)}</span>
+                  <small>{STAGE_POINTS[index]} pts</small>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <form className="guess-form" onSubmit={handleGuess}>
+            <label htmlFor="song-search" className="sr-only">
+              Song search
+            </label>
+            <div className="search-wrap">
+              <input
+                id="song-search"
+                type="search"
+                value={guess}
+                autoComplete="off"
+                placeholder="Type your guess (song name or lyrics...)"
+                disabled={!canGuess}
+                aria-describedby="guess-help"
+                onChange={(event) => setGuess(event.target.value)}
+              />
+              <Search aria-hidden="true" className="search-icon" />
+              {suggestions.length > 0 && (
+                <ul className="suggestions" role="listbox" aria-label="Song suggestions">
+                  {suggestions.map((song) => (
+                    <li key={song.id}>
+                      <button type="button" onClick={() => pickSuggestion(song)}>
+                        <Music2 aria-hidden="true" />
+                        <span>
+                          {song.title}
+                          <small>
+                            {song.artist} - {song.year}
+                          </small>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <p id="guess-help" className="sr-only">
+              Type a song name, choose a suggestion, then submit your guess.
+            </p>
+            <div className="action-row">
+              <button className="primary-button" type="submit" disabled={!canGuess || !guess.trim()}>
+                <Check aria-hidden="true" />
+                Guess
+              </button>
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={!round || roundState === "loading" || isRoundFinished}
+                onClick={showAnswer}
+              >
+                <Eye aria-hidden="true" />
+                Show Answer
+              </button>
+            </div>
+          </form>
+
+          <div className="utility-row">
+            <button className="new-song-button" type="button" onClick={startRound}>
+              {roundState === "loading" ? (
+                <Loader2 aria-hidden="true" className="spin" />
+              ) : (
+                <RotateCcw aria-hidden="true" />
+              )}
+              {round ? "New Song" : "Start Game"}
             </button>
           </div>
-        )}
-      </section>
+
+          {answer && (
+            <div className="answer-panel">
+              <span>{roundState === "correct" ? "You got it" : "Answer"}</span>
+              <strong>{answer.title}</strong>
+              <small>
+                {answer.artist} - {answer.year}
+              </small>
+              <button className="primary-button" type="button" onClick={startRound}>
+                <RotateCcw aria-hidden="true" />
+                Next Song
+              </button>
+            </div>
+          )}
+        </section>
+      </div>
     </main>
   );
 }
