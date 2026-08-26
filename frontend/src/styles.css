@@ -1,0 +1,501 @@
+:root {
+  color: #171717;
+  background: #f7f4ee;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --ink: #171717;
+  --muted: #69645c;
+  --paper: #fffdf8;
+  --line: #d8d0c2;
+  --teal: #006d77;
+  --saffron: #f2a900;
+  --rose: #b23a48;
+  --green: #2f6f4e;
+  --shadow: 0 18px 50px rgb(23 23 23 / 10%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+:focus-visible {
+  outline: 4px solid rgb(242 169 0 / 75%);
+  outline-offset: 4px;
+}
+
+.app-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0;
+}
+
+.intro,
+.game-header,
+.section-heading,
+.player-row,
+.action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.intro {
+  min-height: 132px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--rose);
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  color: var(--ink);
+  font-size: clamp(2.7rem, 10vw, 5.8rem);
+  line-height: 0.92;
+  letter-spacing: 0;
+}
+
+h2 {
+  margin-bottom: 0;
+  color: var(--ink);
+  font-size: 1.45rem;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.score {
+  min-width: 128px;
+  padding: 18px 20px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--saffron);
+  box-shadow: 6px 6px 0 var(--ink);
+  text-align: center;
+}
+
+.score span,
+.duration-readout span,
+.answer-panel span,
+.section-heading span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.score strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.category-section,
+.game-surface {
+  margin-top: 26px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.category-button {
+  min-height: 104px;
+  padding: 16px;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: left;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.category-button:hover {
+  border-color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.category-button[aria-pressed="true"] {
+  border-color: var(--ink);
+  box-shadow: inset 0 -6px 0 rgb(0 109 119 / 22%);
+}
+
+.category-button span {
+  display: block;
+  font-weight: 800;
+}
+
+.category-button small {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.game-surface {
+  padding: 24px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.secondary-button,
+.primary-button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.secondary-button {
+  background: #ffffff;
+}
+
+.primary-button {
+  background: var(--teal);
+  color: #ffffff;
+}
+
+.secondary-button svg,
+.primary-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.player-row {
+  margin-top: 26px;
+  justify-content: flex-start;
+}
+
+.play-button {
+  display: inline-grid;
+  width: 104px;
+  height: 104px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--saffron);
+  color: var(--ink);
+  box-shadow: 8px 8px 0 var(--ink);
+}
+
+.play-button svg {
+  width: 44px;
+  height: 44px;
+}
+
+.duration-readout {
+  min-width: 148px;
+}
+
+.duration-readout strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 2.35rem;
+  line-height: 1;
+}
+
+.status-message {
+  min-height: 52px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--rose);
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.reveal-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 24px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reveal-steps li {
+  min-height: 70px;
+  padding: 12px;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.reveal-steps li span {
+  display: block;
+  font-weight: 900;
+}
+
+.reveal-steps li small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.reveal-steps li.current {
+  border-color: var(--ink);
+  background: #e4f4f2;
+}
+
+.reveal-steps li.done {
+  border-color: var(--green);
+}
+
+.guess-form {
+  display: grid;
+  gap: 14px;
+}
+
+.guess-form label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+
+.guess-form label svg {
+  width: 20px;
+  height: 20px;
+}
+
+.search-wrap {
+  position: relative;
+}
+
+input[type="search"] {
+  width: 100%;
+  min-height: 56px;
+  padding: 0 16px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.suggestions {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 8px);
+  right: 0;
+  left: 0;
+  max-height: 260px;
+  margin: 0;
+  padding: 8px;
+  overflow: auto;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+  list-style: none;
+}
+
+.suggestions button {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+
+.suggestions button:hover,
+.suggestions button:focus-visible {
+  background: #f0e7d6;
+}
+
+.suggestions svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  color: var(--teal);
+}
+
+.suggestions span,
+.answer-panel strong {
+  display: block;
+}
+
+.suggestions small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+}
+
+.answer-panel {
+  display: grid;
+  gap: 8px;
+  margin-top: 22px;
+  padding: 18px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: #f0f8f6;
+}
+
+.answer-panel strong {
+  font-size: 1.7rem;
+  line-height: 1.1;
+}
+
+.answer-panel small {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.answer-panel .primary-button {
+  width: fit-content;
+  margin-top: 8px;
+}
+
+.spin {
+  animation: spin 900ms linear infinite;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    width: min(100% - 20px, 1180px);
+    padding: 18px 0;
+  }
+
+  .intro,
+  .game-header,
+  .player-row,
+  .action-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+  }
+
+  .score {
+    width: 100%;
+  }
+
+  .game-surface {
+    padding: 16px;
+  }
+
+  .player-row {
+    text-align: center;
+  }
+
+  .play-button {
+    align-self: center;
+  }
+
+  .status-message {
+    border-top: 4px solid var(--rose);
+    border-left: 0;
+  }
+
+  .reveal-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reveal-steps li:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+  }
+
+  .answer-panel .primary-button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,202 @@
+[
+  {
+    "id": "chaiyya-chaiyya",
+    "title": "Chaiyya Chaiyya",
+    "artist": "Sukhwinder Singh, Sapna Awasthi",
+    "year": 1998,
+    "category_slugs": ["bollywood", "party-dance", "90s"],
+    "aliases": ["Chaiya Chaiya"],
+    "preview_url": null,
+    "fallback_tone_hz": 392
+  },
+  {
+    "id": "kal-ho-naa-ho",
+    "title": "Kal Ho Naa Ho",
+    "artist": "Sonu Nigam",
+    "year": 2003,
+    "category_slugs": ["bollywood", "romantic", "2000s"],
+    "aliases": ["Kal Ho Na Ho"],
+    "preview_url": null,
+    "fallback_tone_hz": 440
+  },
+  {
+    "id": "tum-hi-ho",
+    "title": "Tum Hi Ho",
+    "artist": "Arijit Singh",
+    "year": 2013,
+    "category_slugs": ["bollywood", "romantic", "2010s"],
+    "aliases": [],
+    "preview_url": null,
+    "fallback_tone_hz": 466
+  },
+  {
+    "id": "jai-ho",
+    "title": "Jai Ho",
+    "artist": "A. R. Rahman, Sukhwinder Singh",
+    "year": 2008,
+    "category_slugs": ["bollywood", "party-dance", "2000s"],
+    "aliases": [],
+    "preview_url": null,
+    "fallback_tone_hz": 523
+  },
+  {
+    "id": "kesariya",
+    "title": "Kesariya",
+    "artist": "Arijit Singh",
+    "year": 2022,
+    "category_slugs": ["bollywood", "romantic", "2020s"],
+    "aliases": [],
+    "preview_url": null,
+    "fallback_tone_hz": 494
+  },
+  {
+    "id": "apna-time-aayega",
+    "title": "Apna Time Aayega",
+    "artist": "Ranveer Singh, DIVINE, Dub Sharma",
+    "year": 2019,
+    "category_slugs": ["bollywood", "hindi-rap-hip-hop", "2010s"],
+    "aliases": ["Apna Time Ayega"],
+    "preview_url": null,
+    "fallback_tone_hz": 330
+  },
+  {
+    "id": "mere-gully-mein",
+    "title": "Mere Gully Mein",
+    "artist": "DIVINE, Naezy",
+    "year": 2015,
+    "category_slugs": ["hindi-rap-hip-hop", "indie", "2010s"],
+    "aliases": ["Mere Gully Mein Divine"],
+    "preview_url": null,
+    "fallback_tone_hz": 349
+  },
+  {
+    "id": "brown-munde",
+    "title": "Brown Munde",
+    "artist": "AP Dhillon, Gurinder Gill, Shinda Kahlon",
+    "year": 2020,
+    "category_slugs": ["punjabi", "party-dance", "2020s"],
+    "aliases": [],
+    "preview_url": null,
+    "fallback_tone_hz": 370
+  },
+  {
+    "id": "excuses",
+    "title": "Excuses",
+    "artist": "AP Dhillon, Gurinder Gill, Intense",
+    "year": 2021,
+    "category_slugs": ["punjabi", "romantic", "2020s"],
+    "aliases": [],
+    "preview_url": null,
+    "fallback_tone_hz": 415
+  },
+  {
+    "id": "pasoori",
+    "title": "Pasoori",
+    "artist": "Ali Sethi, Shae Gill",
+    "year": 2022,
+    "category_slugs": ["hindi-pop", "punjabi", "2020s"],
+    "aliases": [],
+    "preview_url": null,
+    "fallback_tone_hz": 554
+  },
+  {
+    "id": "dooba-dooba",
+    "title": "Dooba Dooba",
+    "artist": "Silk Route",
+    "year": 1998,
+    "category_slugs": ["hindi-pop", "indie", "90s"],
+    "aliases": [],
+    "preview_url": null,
+    "fallback_tone_hz": 587
+  },
+  {
+    "id": "aankhon-mein-tera-hi-chehra",
+    "title": "Aankhon Mein Tera Hi Chehra",
+    "artist": "Aryans",
+    "year": 1999,
+    "category_slugs": ["hindi-pop", "romantic", "90s"],
+    "aliases": ["Aankhon Mein"],
+    "preview_url": null,
+    "fallback_tone_hz": 622
+  },
+  {
+    "id": "bulla-ki-jaana",
+    "title": "Bulla Ki Jaana",
+    "artist": "Rabbi Shergill",
+    "year": 2004,
+    "category_slugs": ["indie", "rock", "2000s", "punjabi"],
+    "aliases": [],
+    "preview_url": null,
+    "fallback_tone_hz": 659
+  },
+  {
+    "id": "bandeh",
+    "title": "Bandeh",
+    "artist": "Indian Ocean",
+    "year": 2004,
+    "category_slugs": ["indie", "rock", "2000s"],
+    "aliases": ["Bandey"],
+    "preview_url": null,
+    "fallback_tone_hz": 698
+  },
+  {
+    "id": "kun-faya-kun",
+    "title": "Kun Faya Kun",
+    "artist": "A. R. Rahman, Javed Ali, Mohit Chauhan",
+    "year": 2011,
+    "category_slugs": ["bollywood", "classical", "2010s"],
+    "aliases": [],
+    "preview_url": null,
+    "fallback_tone_hz": 262
+  },
+  {
+    "id": "piya-bawari",
+    "title": "Piya Bawari",
+    "artist": "Asha Bhosle, Ashwini Bhide Deshpande",
+    "year": 1997,
+    "category_slugs": ["classical", "90s"],
+    "aliases": ["Piya Baawari"],
+    "preview_url": null,
+    "fallback_tone_hz": 294
+  },
+  {
+    "id": "natu-natu",
+    "title": "Naatu Naatu",
+    "artist": "Rahul Sipligunj, Kaala Bhairava",
+    "year": 2021,
+    "category_slugs": ["regional-indian", "party-dance", "2020s"],
+    "aliases": ["Natu Natu"],
+    "preview_url": null,
+    "fallback_tone_hz": 784
+  },
+  {
+    "id": "why-this-kolaveri-di",
+    "title": "Why This Kolaveri Di",
+    "artist": "Dhanush, Anirudh Ravichander",
+    "year": 2011,
+    "category_slugs": ["regional-indian", "party-dance", "2010s"],
+    "aliases": ["Kolaveri Di"],
+    "preview_url": null,
+    "fallback_tone_hz": 740
+  },
+  {
+    "id": "vaathi-coming",
+    "title": "Vaathi Coming",
+    "artist": "Anirudh Ravichander, Gana Balachandar",
+    "year": 2020,
+    "category_slugs": ["regional-indian", "party-dance", "2020s"],
+    "aliases": [],
+    "preview_url": null,
+    "fallback_tone_hz": 831
+  },
+  {
+    "id": "dil-chahta-hai",
+    "title": "Dil Chahta Hai",
+    "artist": "Shankar Mahadevan",
+    "year": 2001,
+    "category_slugs": ["bollywood", "rock", "2000s"],
+    "aliases": [],
+    "preview_url": null,
+    "fallback_tone_hz": 311
+  }
+]
