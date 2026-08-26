@@ -377,8 +377,18 @@ function App() {
 
         <section className="game-card" aria-labelledby="game-heading">
           <div className="game-category-bar">
-            <Music2 aria-hidden="true" />
-            <span>{currentCategory?.name ?? "Category"}</span>
+            <div className="category-label">
+              <Music2 aria-hidden="true" />
+              <span>{currentCategory?.name ?? "Category"}</span>
+            </div>
+            <button className="new-song-button" type="button" onClick={startRound}>
+              {roundState === "loading" ? (
+                <Loader2 aria-hidden="true" className="spin" />
+              ) : (
+                <RotateCcw aria-hidden="true" />
+              )}
+              {round ? "New Song" : "Start Game"}
+            </button>
           </div>
 
           <div className="game-center">
@@ -403,88 +413,81 @@ function App() {
             <div className="sr-only" role="status" aria-live="polite">{message}</div>
           </div>
 
-          <fieldset className="duration-picker" disabled={!round || isRoundFinished}>
-            <legend>Clip Length</legend>
-            <div className="duration-options">
-              {revealStages.map((seconds, index) => (
-                <button
-                  className="duration-option"
-                  type="button"
-                  key={seconds}
-                  aria-pressed={index === stageIndex}
-                  onClick={() => selectDuration(index)}
-                >
-                  <span>{formatDuration(seconds)}</span>
-                  <small>{STAGE_POINTS[index]} pts</small>
-                </button>
-              ))}
-            </div>
-          </fieldset>
-
-          <form className="guess-form" onSubmit={handleGuess}>
-            <label htmlFor="song-search" className="sr-only">
-              Song search
-            </label>
-            <div className="search-wrap">
-              <input
-                id="song-search"
-                type="search"
-                value={guess}
-                autoComplete="off"
-                placeholder="Type your guess (song name or lyrics...)"
-                disabled={!canGuess}
-                aria-describedby="guess-help"
-                onChange={(event) => setGuess(event.target.value)}
-              />
-              <Search aria-hidden="true" className="search-icon" />
-              {suggestions.length > 0 && (
-                <ul className="suggestions" role="listbox" aria-label="Song suggestions">
-                  {suggestions.map((song) => (
-                    <li key={song.id}>
-                      <button type="button" onClick={() => pickSuggestion(song)}>
-                        <Music2 aria-hidden="true" />
-                        <span>
-                          {song.title}
-                          <small>
-                            {song.artist} - {song.year}
-                          </small>
-                        </span>
-                      </button>
-                    </li>
+          {!answer && (
+            <>
+              <fieldset className="duration-picker" disabled={!round || isRoundFinished}>
+                <legend>Clip Length</legend>
+                <div className="duration-options">
+                  {revealStages.map((seconds, index) => (
+                    <button
+                      className="duration-option"
+                      type="button"
+                      key={seconds}
+                      aria-pressed={index === stageIndex}
+                      onClick={() => selectDuration(index)}
+                    >
+                      <span>{formatDuration(seconds)}</span>
+                      <small>{STAGE_POINTS[index]} pts</small>
+                    </button>
                   ))}
-                </ul>
-              )}
-            </div>
-            <p id="guess-help" className="sr-only">
-              Type a song name, choose a suggestion, then submit your guess.
-            </p>
-            <div className="action-row">
-              <button className="primary-button" type="submit" disabled={!canGuess || !guess.trim()}>
-                <Check aria-hidden="true" />
-                Guess
-              </button>
-              <button
-                className="secondary-button"
-                type="button"
-                disabled={!round || roundState === "loading" || isRoundFinished}
-                onClick={showAnswer}
-              >
-                <Eye aria-hidden="true" />
-                Show Answer
-              </button>
-            </div>
-          </form>
+                </div>
+              </fieldset>
 
-          <div className="utility-row">
-            <button className="new-song-button" type="button" onClick={startRound}>
-              {roundState === "loading" ? (
-                <Loader2 aria-hidden="true" className="spin" />
-              ) : (
-                <RotateCcw aria-hidden="true" />
-              )}
-              {round ? "New Song" : "Start Game"}
-            </button>
-          </div>
+              <form className="guess-form" onSubmit={handleGuess}>
+                <label htmlFor="song-search" className="sr-only">
+                  Song search
+                </label>
+                <div className="search-wrap">
+                  <input
+                    id="song-search"
+                    type="search"
+                    value={guess}
+                    autoComplete="off"
+                    placeholder="Type your guess (song name or lyrics...)"
+                    disabled={!canGuess}
+                    aria-describedby="guess-help"
+                    onChange={(event) => setGuess(event.target.value)}
+                  />
+                  <Search aria-hidden="true" className="search-icon" />
+                  {suggestions.length > 0 && (
+                    <ul className="suggestions" role="listbox" aria-label="Song suggestions">
+                      {suggestions.map((song) => (
+                        <li key={song.id}>
+                          <button type="button" onClick={() => pickSuggestion(song)}>
+                            <Music2 aria-hidden="true" />
+                            <span>
+                              {song.title}
+                              <small>
+                                {song.artist} - {song.year}
+                              </small>
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <p id="guess-help" className="sr-only">
+                  Type a song name, choose a suggestion, then submit your guess.
+                </p>
+                <div className="action-row">
+                  <button className="primary-button" type="submit" disabled={!canGuess || !guess.trim()}>
+                    <Check aria-hidden="true" />
+                    Guess
+                  </button>
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    disabled={!round || roundState === "loading" || isRoundFinished}
+                    onClick={showAnswer}
+                  >
+                    <Eye aria-hidden="true" />
+                    Show Answer
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
 
           {answer && (
             <div className="answer-panel">
@@ -493,7 +496,11 @@ function App() {
               <small>
                 {answer.artist} - {answer.year}
               </small>
-              <button className="primary-button" type="button" onClick={startRound}>
+              <button
+                className="primary-button"
+                type="button"
+                onClick={startRound}
+              >
                 <RotateCcw aria-hidden="true" />
                 Next Song
               </button>
