@@ -1,8 +1,8 @@
 # SongSpot.in
 
-SongSpot.in is an Indian-focused song guessing game. Players choose a category, hear progressively longer song previews, and try to identify the track.
+SongSpot.in is an Indian-focused song guessing game. Players choose a category, choose a preview length, and try to identify the track.
 
-Reveal stages:
+Preview length choices:
 
 ```text
 0.1s -> 0.5s -> 2s -> 5s -> 8s
@@ -13,7 +13,7 @@ Reveal stages:
 The first version focuses on the core loop:
 
 ```text
-Open SongSpot.in -> choose category -> play preview -> guess or reveal -> score -> next song
+Open SongSpot.in -> choose category -> choose clip length -> play preview -> guess or reveal answer -> score -> next song
 ```
 
 This repository currently includes:

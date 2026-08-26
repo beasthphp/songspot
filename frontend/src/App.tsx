@@ -1,13 +1,13 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   Check,
+  Eye,
   Headphones,
   Loader2,
   Music2,
   Play,
   RotateCcw,
-  Search,
-  SkipForward
+  Search
 } from "lucide-react";
 import {
   fetchAnswer,
@@ -25,6 +25,8 @@ type BrowserAudioWindow = Window &
   };
 
 const DEFAULT_CATEGORY = "all-indian-songs";
+const DEFAULT_REVEAL_STAGES = [0.1, 0.5, 2, 5, 8];
+const STAGE_POINTS = [100, 80, 60, 40, 20];
 
 function formatDuration(seconds: number) {
   return `${seconds.toFixed(seconds < 1 ? 1 : 0)}s`;
@@ -40,7 +42,7 @@ function App() {
   const [suggestions, setSuggestions] = useState<SongSearchResult[]>([]);
   const [answer, setAnswer] = useState<SongAnswer | null>(null);
   const [score, setScore] = useState(0);
-  const [message, setMessage] = useState("Choose a category to begin.");
+  const [message, setMessage] = useState("Choose a category, start a song, then pick any clip length.");
   const [isPlaying, setIsPlaying] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -53,9 +55,11 @@ function App() {
     [categories, selectedCategory]
   );
 
-  const currentDuration = round?.reveal_stages_seconds[stageIndex] ?? 0.1;
+  const revealStages = round?.reveal_stages_seconds ?? DEFAULT_REVEAL_STAGES;
+  const currentDuration = revealStages[stageIndex] ?? revealStages[0];
+  const currentPoints = STAGE_POINTS[stageIndex] ?? STAGE_POINTS[STAGE_POINTS.length - 1];
   const canGuess = roundState === "ready" && Boolean(round);
-  const canMoveNext = roundState === "correct" || roundState === "revealed";
+  const isRoundFinished = roundState === "correct" || roundState === "revealed";
 
   useEffect(() => {
     fetchCategories()
@@ -121,13 +125,23 @@ function App() {
       setRoundState("ready");
       setMessage(
         nextRound.has_audio_preview
-          ? "Preview ready."
-          : "Preview source pending. Development tone ready."
+          ? "Pick any clip length and press play."
+          : "Licensed preview pending. Development tone is ready."
       );
     } catch {
       setRoundState("error");
       setMessage("A new song could not be loaded.");
     }
+  }
+
+  function selectDuration(index: number) {
+    if (!round || isRoundFinished) {
+      return;
+    }
+
+    stopAudio();
+    setStageIndex(index);
+    setMessage(`${formatDuration(revealStages[index])} clip selected.`);
   }
 
   function playGeneratedTone(duration: number, frequency: number) {
@@ -162,7 +176,7 @@ function App() {
   }
 
   async function playPreview() {
-    if (!round || isPlaying) {
+    if (!round || isPlaying || isRoundFinished) {
       return;
     }
 
@@ -207,24 +221,18 @@ function App() {
         return;
       }
 
-      setMessage("Not quite. Try again or reveal more.");
+      setMessage("Not quite. Try again, or choose a longer clip.");
     } catch {
       setMessage("The guess could not be checked.");
     }
   }
 
-  async function revealMore() {
+  async function showAnswer() {
     if (!round) {
       return;
     }
 
     stopAudio();
-
-    if (stageIndex < round.reveal_stages_seconds.length - 1) {
-      setStageIndex((currentIndex) => currentIndex + 1);
-      setMessage("Longer preview unlocked.");
-      return;
-    }
 
     try {
       const revealedAnswer = await fetchAnswer(round.song_id);
@@ -244,7 +252,7 @@ function App() {
 
   return (
     <main className="app-shell">
-      <section className="intro" aria-labelledby="app-title">
+      <section className="masthead" aria-labelledby="app-title">
         <div>
           <p className="eyebrow">Indian music guessing game</p>
           <h1 id="app-title">SongSpot.in</h1>
@@ -257,8 +265,8 @@ function App() {
 
       <section className="category-section" aria-labelledby="category-heading">
         <div className="section-heading">
-          <h2 id="category-heading">Choose Category</h2>
-          <span>{categories.length} modes</span>
+          <h2 id="category-heading">Category</h2>
+          <span>{currentCategory?.name ?? "Select one"}</span>
         </div>
         <div className="category-grid">
           {categories.map((category) => (
@@ -270,7 +278,7 @@ function App() {
               onClick={() => setSelectedCategory(category.slug)}
             >
               <span>{category.name}</span>
-              <small>{category.description}</small>
+              {selectedCategory === category.slug && <small>Selected</small>}
             </button>
           ))}
         </div>
@@ -288,7 +296,7 @@ function App() {
             ) : (
               <RotateCcw aria-hidden="true" />
             )}
-            {round ? "New Song" : "Start Game"}
+            {round ? "New Song" : "Start"}
           </button>
         </div>
 
@@ -297,32 +305,38 @@ function App() {
             className="play-button"
             type="button"
             aria-label={`Play ${formatDuration(currentDuration)} preview`}
-            disabled={!round || roundState === "loading" || canMoveNext}
+            disabled={!round || roundState === "loading" || isRoundFinished}
             onClick={playPreview}
           >
             {isPlaying ? <Headphones aria-hidden="true" /> : <Play aria-hidden="true" />}
           </button>
           <div className="duration-readout">
-            <span>Current reveal</span>
+            <span>Clip length</span>
             <strong>{formatDuration(currentDuration)}</strong>
+            <small>{currentPoints} points if correct</small>
           </div>
           <div className="status-message" role="status" aria-live="polite">
             {message}
           </div>
         </div>
 
-        <ol className="reveal-steps" aria-label="Reveal progress">
-          {(round?.reveal_stages_seconds ?? [0.1, 0.5, 2, 5, 8]).map((seconds, index) => {
-            const stepState =
-              index === stageIndex ? "current" : index < stageIndex ? "done" : "locked";
-            return (
-              <li className={stepState} key={seconds} aria-current={index === stageIndex ? "step" : undefined}>
+        <fieldset className="duration-picker" disabled={!round || isRoundFinished}>
+          <legend>Choose Preview Length</legend>
+          <div className="duration-options">
+            {revealStages.map((seconds, index) => (
+              <button
+                className="duration-option"
+                type="button"
+                key={seconds}
+                aria-pressed={index === stageIndex}
+                onClick={() => selectDuration(index)}
+              >
                 <span>{formatDuration(seconds)}</span>
-                <small>{stepState}</small>
-              </li>
-            );
-          })}
-        </ol>
+                <small>{STAGE_POINTS[index]} pts</small>
+              </button>
+            ))}
+          </div>
+        </fieldset>
 
         <form className="guess-form" onSubmit={handleGuess}>
           <label htmlFor="song-search">
@@ -369,11 +383,11 @@ function App() {
             <button
               className="secondary-button"
               type="button"
-              disabled={!round || roundState === "loading" || canMoveNext}
-              onClick={revealMore}
+              disabled={!round || roundState === "loading" || isRoundFinished}
+              onClick={showAnswer}
             >
-              <SkipForward aria-hidden="true" />
-              {stageIndex < (round?.reveal_stages_seconds.length ?? 5) - 1 ? "Reveal" : "Answer"}
+              <Eye aria-hidden="true" />
+              Show Answer
             </button>
           </div>
         </form>
